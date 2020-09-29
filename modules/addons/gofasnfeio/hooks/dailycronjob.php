@@ -21,9 +21,9 @@ if( $params['issue_note_after'] and (int)$params['issue_note_after'] > 0 ) {
 		$client = localAPI('GetClientsDetails',array( 'clientid' => $invoices->userid, 'stats' => false, ), false);
 		$invoice = localAPI('GetInvoice',  array('invoiceid' => $invoices->id), false);
 		if( (float)$invoices->total > (float)'0.00' and (int)$datepaid_to_issue >= (int)$datepaid ) {
-			$processed_invoices[$invoices->id]				= 'Paid on: '.$datepaid;
+			$processed_invoices[$invoices->id] = 'Paid on: '.$datepaid;
 			if(!$nfe_for_invoice['status'] or (string)$nfe_for_invoice['status'] === (string)'Error' or (string)$nfe_for_invoice['status'] === (string)'None') {
-				foreach( $invoice['items']['item'] as $value){
+			    foreach( $invoice['items']['item'] as $value){
 					$line_items[]	= $value['description'];	
 				}
 				$customer = gnfe_customer($invoices->userid,$client);
@@ -34,32 +34,60 @@ if( $params['issue_note_after'] and (int)$params['issue_note_after'] > 0 ) {
 					$client_email = $client['email'];
 				}
 				$company = gnfe_get_company();
-				$postfields = array(
-					'cityServiceCode' => $params['service_code'],
-					'description'     => substr( implode("\n",$line_items),  0, 600),
-					'servicesAmount'  => $invoices->total,
-					'borrower' => array(
-						'federalTaxNumber' => $customer['document'],
-						'name'             => $customer['name'],
-						'email'            => $client_email,
-						'address'          => array(
-							'country'               => gnfe_country_code($client['countrycode']),
-							'postalCode'            => preg_replace('/[^0-9]/', '', $client['postcode']),
-							'street'                => str_replace(',', '', preg_replace('/[0-9]+/i', '', $client['address1'])),
-							'number'                => preg_replace('/[^0-9]/', '', $client['address1']),
-							'additionalInformation' => '',
-							'district'              => $client['address2'],
-							'city' => array(
-								'code' => gnfe_ibge(preg_replace("/[^0-9]/", "", $client['postcode'])),
-								'name' => $client['city']
-							),
-							'state' => $client['state'],
-							)
-						),
-						'rpsSerialNumber' => $company['companies']['rpsSerialNumber'],
-						'rpsNumber' => (int)$company['companies']['rpsNumber'] +1,
-					);
-				
+                if(!strlen($customer['insc_municipal']) == 0) {
+                    $postfields = array(
+                        'cityServiceCode' => $params['service_code'],
+                        'description' => substr(implode("\n", $line_items), 0, 600),
+                        'servicesAmount' => $invoices->total,
+                        'borrower' => array(
+                            'federalTaxNumber' => $customer['document'],
+                            'municipalTaxNumber' => $customer['insc_municipal'],
+                            'name' => $customer['name'],
+                            'email' => $client_email,
+                            'address' => array(
+                                'country' => gnfe_country_code($client['countrycode']),
+                                'postalCode' => preg_replace('/[^0-9]/', '', $client['postcode']),
+                                'street' => str_replace(',', '', preg_replace('/[0-9]+/i', '', $client['address1'])),
+                                'number' => preg_replace('/[^0-9]/', '', $client['address1']),
+                                'additionalInformation' => '',
+                                'district' => $client['address2'],
+                                'city' => array(
+                                    'code' => gnfe_ibge(preg_replace("/[^0-9]/", "", $client['postcode'])),
+                                    'name' => $client['city']
+                                ),
+                                'state' => $client['state'],
+                            )
+                        ),
+                        'rpsSerialNumber' => $company['companies']['rpsSerialNumber'],
+                        'rpsNumber' => (int)$company['companies']['rpsNumber'] + 1,
+                    );
+                }else{
+                    $postfields = array(
+                        'cityServiceCode' => $params['service_code'],
+                        'description' => substr(implode("\n", $line_items), 0, 600),
+                        'servicesAmount' => $invoices->total,
+                        'borrower' => array(
+                            'federalTaxNumber' => $customer['document'],
+                            'name' => $customer['name'],
+                            'email' => $client_email,
+                            'address' => array(
+                                'country' => gnfe_country_code($client['countrycode']),
+                                'postalCode' => preg_replace('/[^0-9]/', '', $client['postcode']),
+                                'street' => str_replace(',', '', preg_replace('/[0-9]+/i', '', $client['address1'])),
+                                'number' => preg_replace('/[^0-9]/', '', $client['address1']),
+                                'additionalInformation' => '',
+                                'district' => $client['address2'],
+                                'city' => array(
+                                    'code' => gnfe_ibge(preg_replace("/[^0-9]/", "", $client['postcode'])),
+                                    'name' => $client['city']
+                                ),
+                                'state' => $client['state'],
+                            )
+                        ),
+                        'rpsSerialNumber' => $company['companies']['rpsSerialNumber'],
+                        'rpsNumber' => (int)$company['companies']['rpsNumber'] + 1,
+                    );
+                }
 				$waiting = array();
 				foreach( Capsule::table('gofasnfeio') -> where( 'status', '=', 'Waiting' ) -> get( array( 'invoice_id', 'status') ) as $Waiting ) {
 					$waiting[] = $Waiting->invoice_id;
@@ -69,6 +97,7 @@ if( $params['issue_note_after'] and (int)$params['issue_note_after'] > 0 ) {
 					$error .= $queue;
 				}
 				if($queue === 'success') {}
+
 			}
 		}
 	}

@@ -42,7 +42,6 @@ if( !function_exists('gofasnfeio_output') ) {
 		
 		$nfess = array_slice($nfes, $nfes_from_, $nfes_to);
 		
-		
 		if ((int)$nfes_page === (int)$nfes_pages) {
 			$nfes_to = $nfes_total;
 			$nfess = array_slice($nfes, $nfes_from_, $nfes_to_);

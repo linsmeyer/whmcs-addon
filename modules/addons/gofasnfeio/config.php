@@ -12,6 +12,7 @@ if (!defined("WHMCS")){die();}
 use WHMCS\Database\Capsule;
 if( !function_exists('gofasnfeio_config') ) {
 function gofasnfeio_config() {
+    require_once __DIR__ . '/functions.php';
 	$module_version = '1.2.2';
 	$module_version_int = (int)preg_replace('/[^0-9]/', '', $module_version);
 	
@@ -199,7 +200,7 @@ function gofasnfeio_config() {
 				'FriendlyName' => 'Agendar Emissão',
 				'Type' => 'text',
 				'Default' => '',
-				'Description' => '<br>Número de dias após o pagamento da fatura que as notas devem ser emitidas. <span style="color:#c00">Preencher essa opção desativa a opção anterior.</span>',
+				'Description' => '<br>Número de dias após o pagamento da fatura que as notas devem ser emitidas. <span style="color:#c00">Esta opção funciona somente com a opção anterior selecionada Quando a fatura é Paga.</span>',
 	));
 	$cancel_invoice_cancel_nfe = array('cancel_invoice_cancel_nfe' => array(
 				'FriendlyName' => 'Cancelar NFE',
@@ -217,14 +218,46 @@ function gofasnfeio_config() {
 				'FriendlyName' => '',
 				'Description' => '&copy; '.date('Y').' <a target="_blank" title="↗ Gofas Software" href="https://gofas.net">Gofas Software</a>',
 	));
-	$fields = array_merge($intro,$api_key,$company_id,$service_code,$rps_serial_number,$rps_number,$issue_note,$issue_note_after,$cancel_invoice_cancel_nfe,$debug,$footer);
-    $configarray = array(
+
+    $insc_municipal = array('insc_municipal' => array(
+        'FriendlyName' => 'Inscrição Municipal',
+        'Type' => 'dropdown',
+        'Options' => gnfe_customfields_dropdow(),
+        'Description' => 'Escolha o campo personalizado de Inscrição Municipal'));
+
+
+//    $insc_municipal = array('package' => array(
+//        'FriendlyName' => 'Package Name',
+//        'Type' => 'dropdown', # Dropdown Choice of Options
+//        'Options' => 'Starter,Advanced,Ultimate',
+//        'Description' => 'Sample Dropdown',
+//        'Default' => 'Advanced',
+//    ),
+//        'packageWithNVP' => array(
+//        'FriendlyName' => 'Package Name v2',
+//        'Type' => 'dropdown', # Dropdown Choice of Options
+//        'Options' => array(
+//            'package1' => 'Starter',
+//            'package2' => 'Advanced',
+//            'package3' => 'Ultimate',
+//        ),
+//        'Description' => 'Sample Dropdown',
+//        'Default' => 'package2',
+//    ));
+
+
+//	$fields = array_merge($intro,$api_key,$company_id,$service_code,$rps_serial_number,$rps_number,$issue_note,$issue_note_after,$cancel_invoice_cancel_nfe,$debug,$footer);
+	$fields = array_merge($intro,$api_key,$company_id,$service_code,$rps_serial_number,$rps_number,$issue_note,$issue_note_after,$cancel_invoice_cancel_nfe,$debug,$footer,$insc_municipal);
+
+	$configarray = array(
     "name" => "Gofas NFE.io",
     "description" => "Módulo Gofas NFE.io para WHMCS",
     "version" => $module_version,
     "author" => '<a title="Gofas Software" href="https://gofas.net/" target="_blank" alt="Gofas"><img src="'.$whmcs_url.'modules/addons/gofasnfeio/lib/logo.png"></a>',
 	 "fields" => $fields,
 	 );
+
+
     return $configarray;
 }
 }
