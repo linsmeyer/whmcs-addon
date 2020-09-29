@@ -141,9 +141,6 @@ if( !function_exists('gnfe_customfields_dropdow') ) {
         $customfields_array = array();
         foreach (Capsule::table('tblcustomfields')->where('type', '=', 'client')->get(array('fieldname', 'id')) as $customfield) {
             $customfields_array[] = $customfield;
-            // $customfield_id = $customfield->id;
-            // $customfield_name = ' ' . strtolower($customfield->fieldname);
-
         }
         $customfields = json_decode(json_encode($customfields_array), true);
         if (!$customfields) {
@@ -166,11 +163,12 @@ if( !function_exists('gnfe_country_code') ) {
 		return $array[$country];
 	}
 }
+
 if( !function_exists('gnfe_ibge') ) {
 	function gnfe_ibge($zip) {
 		$curl = curl_init();
 		curl_setopt ($curl, CURLOPT_URL, 'https://open.nfe.io/v1/cities/'.$zip.'/postalcode');
-		curl_setopt ($curl, CUOPT_TIMEOUT, 30);
+		curl_setopt ($curl, CURLOPT_TIMEOUT, 30);
 		curl_setopt($curl, CURLOPT_RETURNTRANSFER,1);
 		$response = curl_exec ($curl);
 		curl_close ($curl);

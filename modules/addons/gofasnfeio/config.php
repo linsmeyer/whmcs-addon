@@ -225,29 +225,7 @@ function gofasnfeio_config() {
         'Options' => gnfe_customfields_dropdow(),
         'Description' => 'Escolha o campo personalizado de Inscrição Municipal'));
 
-
-//    $insc_municipal = array('package' => array(
-//        'FriendlyName' => 'Package Name',
-//        'Type' => 'dropdown', # Dropdown Choice of Options
-//        'Options' => 'Starter,Advanced,Ultimate',
-//        'Description' => 'Sample Dropdown',
-//        'Default' => 'Advanced',
-//    ),
-//        'packageWithNVP' => array(
-//        'FriendlyName' => 'Package Name v2',
-//        'Type' => 'dropdown', # Dropdown Choice of Options
-//        'Options' => array(
-//            'package1' => 'Starter',
-//            'package2' => 'Advanced',
-//            'package3' => 'Ultimate',
-//        ),
-//        'Description' => 'Sample Dropdown',
-//        'Default' => 'package2',
-//    ));
-
-
-//	$fields = array_merge($intro,$api_key,$company_id,$service_code,$rps_serial_number,$rps_number,$issue_note,$issue_note_after,$cancel_invoice_cancel_nfe,$debug,$footer);
-	$fields = array_merge($intro,$api_key,$company_id,$service_code,$rps_serial_number,$rps_number,$issue_note,$issue_note_after,$cancel_invoice_cancel_nfe,$debug,$footer,$insc_municipal);
+    $fields = array_merge($intro,$api_key,$company_id,$service_code,$rps_serial_number,$rps_number,$issue_note,$issue_note_after,$cancel_invoice_cancel_nfe,$debug,$footer,$insc_municipal);
 
 	$configarray = array(
     "name" => "Gofas NFE.io",
