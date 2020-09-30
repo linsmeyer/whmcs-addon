@@ -6,7 +6,7 @@
  * @copyright	2020 https://gofas.net
  * @license		https://gofas.net?p=9340
  * @support		https://gofas.net/?p=12313
- * @version		1.2.2
+ * @version		1.2.3
  */
 if (!defined("WHMCS")){die();}
 use WHMCS\Database\Capsule;
@@ -18,7 +18,7 @@ foreach( Capsule::table('gofasnfeio')->orderBy('id', 'desc')->where('status', '=
 		$invoice = localAPI('GetInvoice',  array('invoiceid' => $waiting->invoice_id), false);
 		$client = localAPI('GetClientsDetails',array( 'clientid' => $invoice['userid'], 'stats' => false, ), false);
 		foreach( $invoice['items']['item'] as $value){
-			$line_items[]	= $value['description'];	
+			$line_items[]	= $value['description'];
 		}
 		$customer = gnfe_customer($invoices->userid,$client);
 		$gnfe_get_nfes = gnfe_get_nfes();

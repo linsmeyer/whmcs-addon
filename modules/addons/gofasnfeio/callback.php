@@ -17,8 +17,9 @@ if($post){
     foreach( Capsule::table('tbladdonmodules') -> where( 'module', '=', 'gofasnfeio' ) -> get( array( 'setting', 'value') ) as $settings ) {
         $params[$settings->setting] = $settings->value;
     }
-    foreach( Capsule::table('gofasnfeio')->where('nfe_id', '=', $post['id'])->get(array( 'invoice_id', 'user_id', 'nfe_id', 'status', 'services_amount', 'environment', 'flow_status', 'pdf', 'created_at', 'updated_at' )) as $key => $value ) {
-        $nfe_for_invoice[$key] = json_decode(json_encode($value), true);
+    foreach( Capsule::table('gofasnfeio')->where('nfe_id', '=', $post['id'])->
+    get(array( 'invoice_id', 'user_id', 'nfe_id', 'status', 'services_amount', 'environment', 'flow_status', 'pdf', 'created_at', 'updated_at' )) as $key => $value ) {
+        $nfe_for_invoice[$key]					= json_decode(json_encode($value), true);
     }
     $nfe = $nfe_for_invoice['0'];
     if((string)$nfe['nfe_id'] === (string)$post['id'] and $nfe['status'] !== (string)$post['status'] ){
@@ -65,6 +66,7 @@ if($post){
                 $rps_serial_number = 'IO';
                 $rps_serial_number_ = $rps_serial_number;
             }
+            ///
             if($params['rps_number'] and (string)$params['rps_number'] !== (string)'zero'){
                 $rps_number = $params['rps_number'];
             }
@@ -74,6 +76,7 @@ if($post){
             elseif(((string)$params['rps_number'] === (string)'zero' and !$gnfe_get_nfes['serviceInvoices']['0']['rpsNumber']) or (!$params['rps_number'] and !$gnfe_get_nfes['serviceInvoices']['0']['rpsNumber'])){
                 $rps_number = 0;
             }
+
             if (!strlen($customer['insc_municipal']) == 0) {
                 $postfields = array(
                     'cityServiceCode' => $params['service_code'],
