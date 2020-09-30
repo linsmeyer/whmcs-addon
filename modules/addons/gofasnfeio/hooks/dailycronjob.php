@@ -13,19 +13,19 @@ use WHMCS\Database\Capsule;
 $params = gnfe_config();
 
 if( $params['issue_note_after'] and (int)$params['issue_note_after'] > 0 ) {
-	foreach( Capsule::table('tblinvoices')->where('status', '=', 'Paid')->get( array( 'id', 'userid', 'datepaid','total' ) ) as $invoices ) {
-		$datepaid			= date('Ymd', strtotime($invoices->datepaid));
-		$datepaid_to_issue_	= '-'.$params['issue_note_after'].' days';
-		$datepaid_to_issue	= date('Ymd', strtotime($datepaid_to_issue_));
-		$nfe_for_invoice = gnfe_get_local_nfe($invoices->id,array('nfe_id', 'status', 'services_amount','created_at'));
-		$client = localAPI('GetClientsDetails',array( 'clientid' => $invoices->userid, 'stats' => false, ), false);
-		$invoice = localAPI('GetInvoice',  array('invoiceid' => $invoices->id), false);
-		if( (float)$invoices->total > (float)'0.00' and (int)$datepaid_to_issue >= (int)$datepaid ) {
-			$processed_invoices[$invoices->id] = 'Paid on: '.$datepaid;
-			if(!$nfe_for_invoice['status'] or (string)$nfe_for_invoice['status'] === (string)'Error' or (string)$nfe_for_invoice['status'] === (string)'None') {
-			    foreach( $invoice['items']['item'] as $value){
-					$line_items[]	= $value['description'];	
-				}
+    foreach( Capsule::table('tblinvoices')->where('status', '=', 'Paid')->get( array( 'id', 'userid', 'datepaid','total' ) ) as $invoices ) {
+        $datepaid			= date('Ymd', strtotime($invoices->datepaid));
+        $datepaid_to_issue_	= '-'.$params['issue_note_after'].' days';
+        $datepaid_to_issue	= date('Ymd', strtotime($datepaid_to_issue_));
+        $nfe_for_invoice = gnfe_get_local_nfe($invoices->id,array('nfe_id', 'status', 'services_amount','created_at'));
+        $client = localAPI('GetClientsDetails',array( 'clientid' => $invoices->userid, 'stats' => false, ), false);
+        $invoice = localAPI('GetInvoice',  array('invoiceid' => $invoices->id), false);
+        if( (float)$invoices->total > (float)'0.00' and (int)$datepaid_to_issue >= (int)$datepaid ) {
+            $processed_invoices[$invoices->id]				= 'Paid on: '.$datepaid;
+            if(!$nfe_for_invoice['status'] or (string)$nfe_for_invoice['status'] === (string)'Error' or (string)$nfe_for_invoice['status'] === (string)'None') {
+                foreach( $invoice['items']['item'] as $value){
+                    $line_items[]	= $value['description'];
+                }
 				$customer = gnfe_customer($invoices->userid,$client);
 				if($params['email_nfe']) {
 					$client_email = $client['email'];
@@ -88,20 +88,20 @@ if( $params['issue_note_after'] and (int)$params['issue_note_after'] > 0 ) {
                         'rpsNumber' => (int)$company['companies']['rpsNumber'] + 1,
                     );
                 }
-				$waiting = array();
-				foreach( Capsule::table('gofasnfeio') -> where( 'status', '=', 'Waiting' ) -> get( array( 'invoice_id', 'status') ) as $Waiting ) {
-					$waiting[] = $Waiting->invoice_id;
-				}
-				$queue = gnfe_queue_nfe($invoices->id);
-				if($queue !== 'success') {
-					$error .= $queue;
-				}
-				if($queue === 'success') {}
 
-			}
-		}
-	}
-	if($params['debug']) {
-		logModuleCall('gofas_nfeio', 'dailycronjob', array('$params'=>$params, '$datepaid'=>$datepaid, '$datepaid_to_issue'=>$datepaid_to_issue,'gnfe_get_nfes'=> gnfe_get_nfes() ), 'post',  array('processed_invoices'=>$processed_invoices, 'queue'=>$queue,'error'=>$error ), 'replaceVars');
-	}
+                $waiting = array();
+                foreach( Capsule::table('gofasnfeio') -> where( 'status', '=', 'Waiting' ) -> get( array( 'invoice_id', 'status') ) as $Waiting ) {
+                    $waiting[] = $Waiting->invoice_id;
+                }
+                $queue = gnfe_queue_nfe($invoices->id);
+                if($queue !== 'success') {
+                    $error .= $queue;
+                }
+                if($queue === 'success') {}
+            }
+        }
+    }
+    if($params['debug']) {
+        logModuleCall('gofas_nfeio', 'dailycronjob', array('$params'=>$params, '$datepaid'=>$datepaid, '$datepaid_to_issue'=>$datepaid_to_issue,'gnfe_get_nfes'=> gnfe_get_nfes() ), 'post',  array('processed_invoices'=>$processed_invoices, 'queue'=>$queue,'error'=>$error ), 'replaceVars');
+    }
 }
